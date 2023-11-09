@@ -1,0 +1,95 @@
+from datasets import load_dataset
+import numpy as np
+import pandas as pd
+import requests
+
+dataset = load_dataset("mstz/heart_failure")
+
+data = dataset["train"]
+
+
+edad = data["age"]
+edades_np = np.array(edad)
+
+#Calcular el promedio de edad
+promedio_edad = np.mean(edades_np)
+print(promedio_edad)
+
+#parte 2
+# convertir el dataset a un dataframe
+df= pd.DataFrame(data)
+# Separar el DataFrame en dos conjuntos
+df_dead = df[df['is_dead'] == 1]
+df_alive = df[df['is_dead'] == 0]
+
+avg_age_dead = df_dead['age'].mean()
+avg_age_alive = df_alive['age'].mean()
+
+# Imprimir los promedios de edades
+print(f"Promedio de edades de las personas fallecidas: {avg_age_dead}")
+print(f"Promedio de edades de las personas vivas: {avg_age_alive}")
+
+# Calcular los promedios de las edades
+avg_age_dead = df_dead['age'].mean()
+avg_age_alive = df_alive['age'].mean()
+
+#parte 3
+
+# Verificar los tipos de datos en cada columna
+print("Tipos de datos en cada columna:")
+print(df.dtypes)
+
+# Calcular la cantidad de hombres fumadores y mujeres fumadoras
+smokers_by_gender = df.groupby(['is_male', 'is_smoker']).size()
+
+# Imprimir la cantidad de hombres fumadores y mujeres fumadoras
+print("Cantidad de hombres y mujeres fumadoras:")
+print(smokers_by_gender)
+
+#parte 4
+
+def descargar_y_guardar_como_csv(url, nombre_archivo):
+    response = requests.get(url)
+    if response.status_code == 200:
+        with open(nombre_archivo, 'w') as archivo:
+            archivo.write(response.text)
+            print(f"El archivo {nombre_archivo} se ha descargado y guardado con éxito.")
+    else:
+        print(f"No se pudo descargar el archivo de la URL: {url}")
+
+url= 'https://huggingface.co/datasets/mstz/heart_failure/raw/main/heart_failure_clinical_records_dataset.csv' 
+nombre_archivo = 'fallas_corazon.csv'  # El nombre que desees para tu archivo
+
+
+descargar_y_guardar_como_csv(url, nombre_archivo)
+
+#parte 5
+
+def procesar_data_frame(df):
+    # Verificar valores faltantes
+    if df.isnull().values.any():
+        df = df.dropna()
+        print("Se eliminaron los valores faltantes.")
+
+    # Verificar filas duplicadas
+    if df.duplicated().any():
+        df = df.drop_duplicates()
+        print("Se eliminaron las filas duplicadas.")
+
+    # Verificar y eliminar valores atípicos
+    Q1 = df['age'].quantile(0.25)
+    Q3 = df['age'].quantile(0.75)
+    IQR = Q3 - Q1
+    df = df[~((df['age'] < (Q1 - 1.5 * IQR)) | (df['age'] > (Q3 + 1.5 * IQR)))]
+
+    # Crear la columna de categoría de edades
+    df['categoria_edad'] = pd.cut(df['age'], bins=[0, 12, 19, 39, 59, float('inf')],
+                                  labels=['Niño', 'Adolescente', 'Jóvenes adulto', 'Adulto', 'Adulto mayor'])
+
+    # Guardar el DataFrame procesado como csv
+    df.to_csv('datos_procesados.csv', index=False)
+    print("Se guardó el DataFrame procesado como datos_procesados.csv")
+
+# Ejemplo de uso con un DataFrame cargado previamente desde un archivo CSV
+data_frame = pd.read_csv('fallas_corazon.csv')  # Reemplaza entre () colocando el nombre de tu propio archivo
+procesar_data_frame(data_frame)
