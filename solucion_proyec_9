@@ -5,7 +5,7 @@ import pandas as pd
 from sklearn.manifold import TSNE
 import plotly.express as px
 
-df = pd.read_csv("datos_procesados1.csv")
+df = pd.read_csv("datos_procesados2.csv")
 
 dfnew = df.drop(columns=["DEATH_EVENT", "categoria_edad"])
 
