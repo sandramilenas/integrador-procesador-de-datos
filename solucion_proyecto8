@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 
 # Lee los datos procesados
-df = pd.read_csv('datos_procesados2.csv')
+df = pd.read_csv('integrador-procesador-de-datos\datos_procesados2.csv')
 
 valores_anémicos = df['anaemia'].value_counts()
 valores_diabéticos = df['diabetes'].value_counts()

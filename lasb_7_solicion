@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 
 # Lee los datos procesados
-df = pd.read_csv('datos_procesados2.csv')
+df = pd.read_csv('integrador-procesador-de-datos\datos_procesados2.csv')
 
 plt.figure(figsize=(10,6))
 plt.hist(df['age'], bins=20, color='skyblue')
